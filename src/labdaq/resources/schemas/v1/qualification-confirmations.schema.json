@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.local/schemas/v1/qualification-confirmations.schema.json",
+  "title": "LabDAQ qualification confirmations version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "confirmations"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "confirmations": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["confirmation_id", "confirmed", "confirmed_at", "operator", "statement", "evidence_reference"],
+        "properties": {
+          "confirmation_id": {"type": "string", "minLength": 1},
+          "confirmed": {"type": "boolean"},
+          "confirmed_at": {"type": "string", "format": "date-time"},
+          "operator": {"type": "string", "minLength": 1},
+          "statement": {"type": "string", "minLength": 1},
+          "evidence_reference": {"type": ["string", "null"]},
+          "sample_index": {"type": ["integer", "null"], "minimum": 0},
+          "sample_count": {"type": ["integer", "null"], "minimum": 0}
+        }
+      }
+    }
+  }
+}

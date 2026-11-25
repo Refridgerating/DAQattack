@@ -1,0 +1,39 @@
+# Python environments and local toolchains
+.venv/
+.venv-*/
+.tools/
+
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.import_linter_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Laboratory data and generated sessions
+Data/
+*.tdms
+events.jsonl
+manifest.json.tmp
+.recording.lock
+.metadata-reserve
+processed/
+plots/
+exports/
+
+# Locally retained manufacturer document
+/ENG_DS_830M1_Triaxial_Accelerometer_A4.pdf

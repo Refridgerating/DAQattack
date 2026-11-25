@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scenario_id": "disconnect",
+  "scenario_revision": 1,
+  "name": "Injected reconnectable disconnect",
+  "description": "The device disconnects at absolute sample 12345 and can be restored by reset.",
+  "generator_version": "sim-v1",
+  "seed": 7,
+  "pacing_mode": "immediate",
+  "channel_signals": [
+    {"channel_id": "accel-x", "raw_unit": "V", "bias_v": 1.65, "components": []},
+    {"channel_id": "accel-y", "raw_unit": "V", "bias_v": 1.65, "components": []},
+    {"channel_id": "accel-z", "raw_unit": "V", "bias_v": 1.65, "components": []},
+    {"channel_id": "charge-signal", "raw_unit": "V", "bias_v": 0.0, "components": []}
+  ],
+  "fault_schedule": [
+    {"type": "disconnect", "fault_id": "device-removal", "sample_index": 12345, "reconnectable": true}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scenario_id": "impulse-alignment",
+  "scenario_revision": 1,
+  "name": "Exact impulse alignment",
+  "description": "A common one-sample impulse at absolute sample 12345.",
+  "generator_version": "sim-v1",
+  "seed": 2,
+  "pacing_mode": "immediate",
+  "channel_signals": [
+    {"channel_id": "accel-x", "raw_unit": "V", "bias_v": 0.0, "components": [{"type": "impulse", "component_id": "impulse-x", "start_sample": 12345, "amplitude_v": 0.1, "width_samples": 1}]},
+    {"channel_id": "accel-y", "raw_unit": "V", "bias_v": 0.0, "components": [{"type": "impulse", "component_id": "impulse-y", "start_sample": 12345, "amplitude_v": -0.2, "width_samples": 1}]},
+    {"channel_id": "accel-z", "raw_unit": "V", "bias_v": 0.0, "components": [{"type": "impulse", "component_id": "impulse-z", "start_sample": 12345, "amplitude_v": 0.3, "width_samples": 1}]},
+    {"channel_id": "charge-signal", "raw_unit": "V", "bias_v": 0.0, "components": [{"type": "impulse", "component_id": "impulse-charge", "start_sample": 12345, "amplitude_v": -0.4, "width_samples": 1}]}
+  ],
+  "fault_schedule": [],
+  "expected_reference_values": {"impulse_sample_index": 12345}
+}

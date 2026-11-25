@@ -1,0 +1,19 @@
+LABDAQ 0.1.0.dev7 INTERNAL FEEDBACK-PREVIEW NOTICE
+
+Copyright (c) 2026. All rights reserved.
+
+The copyright holder authorizes members of the owning laboratory to install,
+copy, and use this specific LabDAQ 0.1.0.dev7 feedback-preview build solely for
+supervised internal evaluation and to provide feedback to the project owner.
+
+This limited permission does not authorize production use, safety-critical or
+unattended operation, publication, sublicensing, sale, or redistribution outside
+the owning laboratory. It does not qualify physical hardware, wiring, sensor
+power, calibration, external conditioning, or acquired scientific results.
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. TESTERS MUST
+PRESERVE AND REPORT FAULTS, COUNT MISMATCHES, SUSPECTED SAMPLE LOSS, AND PARTIAL
+SESSIONS. SIMULATOR RESULTS MUST NOT BE REPRESENTED AS PHYSICAL ACCEPTANCE.
+
+This notice supplements the repository LICENSE only for the narrow internal
+evaluation permission stated above. All other rights remain reserved.

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.local/schemas/v1/plot-request.schema.json",
+  "title": "LabDAQ plot request v1",
+  "type": "object",
+  "required": ["schema_version", "source_session", "representation", "channels", "sample_range", "viewport", "recipe_id", "spectral_input_stage"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source_session": {"type": "string", "minLength": 1},
+    "representation": {"enum": ["raw", "calibrated", "filtered", "fft", "psd"]},
+    "channels": {"$ref": "#/$defs/channels"},
+    "sample_range": {"$ref": "#/$defs/sample_range"},
+    "viewport": {
+      "type": "object",
+      "required": ["max_points", "algorithm"],
+      "properties": {
+        "max_points": {"type": "integer", "minimum": 1},
+        "algorithm": {"const": "min-max-v1"}
+      },
+      "additionalProperties": false
+    },
+    "recipe_id": {"type": ["string", "null"]},
+    "spectral_input_stage": {"enum": ["raw", "calibrated", "conditioned", null]}
+  },
+  "$defs": {
+    "channels": {
+      "type": "object",
+      "required": ["channel_ids", "display_names"],
+      "properties": {
+        "channel_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "display_names": {"type": ["array", "null"], "items": {"type": "string", "minLength": 1}}
+      },
+      "additionalProperties": false
+    },
+    "sample_range": {
+      "type": "object",
+      "required": ["start_index", "stop_index", "sample_count", "sample_rate_hz", "requested_start_seconds", "requested_stop_seconds"],
+      "properties": {
+        "start_index": {"type": "integer", "minimum": 0},
+        "stop_index": {"type": "integer", "minimum": 1},
+        "sample_count": {"type": "integer", "minimum": 1},
+        "sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "requested_start_seconds": {"type": ["number", "null"], "minimum": 0},
+        "requested_stop_seconds": {"type": ["number", "null"], "exclusiveMinimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

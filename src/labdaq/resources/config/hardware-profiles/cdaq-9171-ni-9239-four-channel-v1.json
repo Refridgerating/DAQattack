@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "hardware_profile_id": "cdaq-9171-ni-9239-four-channel",
+  "profile_revision": 1,
+  "devices": [
+    {
+      "device_id": "cdaq-chassis",
+      "vendor": "National Instruments",
+      "model": "cDAQ-9171",
+      "role": "compact-daq-chassis",
+      "required": true,
+      "expected_serial_number": null,
+      "alias": null
+    }
+  ],
+  "modules": [
+    {
+      "module_id": "voltage-module",
+      "device_id": "cdaq-chassis",
+      "vendor": "National Instruments",
+      "model": "NI-9239",
+      "logical_slot": 0,
+      "required": true,
+      "channel_count": 4,
+      "expected_serial_number": null
+    }
+  ],
+  "supported_physical_channels": [
+    {"module_id": "voltage-module", "channel_index": 0, "terminal_configuration": "differential"},
+    {"module_id": "voltage-module", "channel_index": 1, "terminal_configuration": "differential"},
+    {"module_id": "voltage-module", "channel_index": 2, "terminal_configuration": "differential"},
+    {"module_id": "voltage-module", "channel_index": 3, "terminal_configuration": "differential"}
+  ],
+  "required_terminal_configuration": "differential",
+  "input_min_v": -10.0,
+  "input_max_v": 10.0,
+  "application_supported_sample_rates_hz": [50000.0],
+  "supported_trigger_modes": ["immediate"],
+  "minimum_channel_count": 3,
+  "maximum_channel_count": 4,
+  "notes": "Logical requirements only; M03 will discover aliases, serial numbers, and actual rates.",
+  "nominal_calibration_fallback": {
+    "sensor_model": "830M1-0200",
+    "sensitivity_value": 6.3,
+    "sensitivity_unit": "mV/g",
+    "permitted_channel_roles": ["accelerometer_x", "accelerometer_y", "accelerometer_z"]
+  }
+}

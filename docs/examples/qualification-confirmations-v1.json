@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "confirmations": [
+    {
+      "confirmation_id": "charge-conditioning-compatible",
+      "confirmed": true,
+      "confirmed_at": "2026-08-13T12:00:00+00:00",
+      "operator": "replace-with-operator",
+      "statement": "The documented charge-conditioning path is compatible with the NI input.",
+      "evidence_reference": "replace-with-reviewed-wiring-or-fixture-reference",
+      "sample_index": null
+    }
+  ]
+}

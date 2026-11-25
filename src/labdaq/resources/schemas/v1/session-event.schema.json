@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.invalid/schemas/v1/session-event.schema.json",
+  "title": "LabDAQ persisted session event version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "event_sequence", "source_sequence", "session_id",
+    "timestamp", "monotonic_timestamp", "source", "severity", "code",
+    "acquisition_state", "message", "sample_index", "details"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "event_sequence": {"type": "integer", "minimum": 0},
+    "source_sequence": {"type": "integer", "minimum": 0},
+    "session_id": {"type": "string", "minLength": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "monotonic_timestamp": {"type": "number", "minimum": 0},
+    "source": {"type": "string", "minLength": 1},
+    "severity": {"enum": ["info", "warning", "error", "critical"]},
+    "code": {"type": "string", "pattern": "^DAQ\\."},
+    "acquisition_state": {"type": "string"},
+    "message": {"type": "string", "minLength": 1},
+    "sample_index": {"type": ["integer", "null"], "minimum": 0},
+    "details": {"type": "object"}
+  }
+}

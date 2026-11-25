@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "plan_id": "throughput-v1",
+  "plan_revision": 1,
+  "hardware_profile_id": null,
+  "hardware_profile_revision": null,
+  "experiment_config_hash": null,
+  "tests": [
+    {
+      "test_id": "discovery-identity", "version": 1,
+      "display_name": "Discovery and identity", "purpose": "Verify live hardware and ordered channels.",
+      "required": true, "classification": "blocking", "execution_mode": "automated",
+      "required_inputs": ["hardware-profile", "experiment-config", "live-discovery"], "prerequisites": [],
+      "declared_metrics": ["device-count", "channel-count"], "limits": [],
+      "required_confirmation_ids": [], "advisory_reason_codes": []
+    },
+    {
+      "test_id": "capability-configuration", "version": 1,
+      "display_name": "Capability and configuration", "purpose": "Validate four-channel 50 kS/s operation and bounded recording buffers.",
+      "required": true, "classification": "blocking", "execution_mode": "automated",
+      "required_inputs": ["hardware-profile", "experiment-config", "disk-space"], "prerequisites": ["discovery-identity"],
+      "declared_metrics": ["requested-rate-hz", "channel-count", "estimated-storage-bytes"], "limits": [],
+      "required_confirmation_ids": [], "advisory_reason_codes": []
+    },
+    {
+      "test_id": "sustained-throughput", "version": 1,
+      "display_name": "Sustained end-to-end throughput", "purpose": "Exercise one production acquisition stream, lossless recording path, verification, and replay.",
+      "required": true, "classification": "blocking", "execution_mode": "automated",
+      "required_inputs": ["raw-synchronized-session", "recording-telemetry", "replay-verification"], "prerequisites": ["capability-configuration"],
+      "declared_metrics": ["acquired-count", "persisted-count", "replayed-count", "missing-count", "duplicated-count", "reordered-count", "queue-utilization", "stop-latency-seconds"],
+      "limits": [
+        {"limit_id": "missing-count", "comparison": "lte", "value": 0.0, "unit": "samples", "signal_stage": "acquisition", "source_category": "engineering-policy", "source_reference": "DAQ-M08 section 6.10", "rationale": "The authoritative raw stream permits no gaps.", "consequence": "fail"},
+        {"limit_id": "duplicated-count", "comparison": "lte", "value": 0.0, "unit": "samples", "signal_stage": "acquisition", "source_category": "engineering-policy", "source_reference": "DAQ-M08 section 6.10", "rationale": "The authoritative raw stream permits no duplicate indices.", "consequence": "fail"},
+        {"limit_id": "reordered-count", "comparison": "lte", "value": 0.0, "unit": "samples", "signal_stage": "acquisition", "source_category": "engineering-policy", "source_reference": "DAQ-M08 section 6.10", "rationale": "The authoritative raw stream must be monotonic.", "consequence": "fail"},
+        {"limit_id": "backpressure-events", "comparison": "lte", "value": 0.0, "unit": "events", "signal_stage": "acquisition", "source_category": "engineering-policy", "source_reference": "DAQ-M04 recording priority invariant", "rationale": "Recording backpressure is a blocking acquisition fault.", "consequence": "fail"}
+      ],
+      "required_confirmation_ids": [], "advisory_reason_codes": []
+    }
+  ],
+  "acquisition_rate_hz": 50000.0,
+  "powered_idle_duration_seconds": 10.0,
+  "assisted_window_duration_seconds": 2.0,
+  "throughput_duration_seconds": 600.0,
+  "maximum_report_age_seconds": null,
+  "evidence_retention": "retain-raw"
+}

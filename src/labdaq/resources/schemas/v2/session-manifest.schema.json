@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.invalid/schemas/v2/session-manifest.schema.json",
+  "title": "LabDAQ durable session manifest version 2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "raw_container",
+    "event_schema_version",
+    "logical_digest_version",
+    "session",
+    "software",
+    "hardware",
+    "acquisition",
+    "channels",
+    "processing_recipe",
+    "counts",
+    "checkpoint",
+    "integrity",
+    "fault",
+    "recovery"
+  ],
+  "properties": {
+    "schema_version": {"const": 2},
+    "raw_container": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format", "filename", "layout_version", "dataset_path", "dtype",
+        "axis_order", "chunk_shape", "compression", "chunk_checksum", "swmr"
+      ],
+      "properties": {
+        "format": {"const": "hdf5"},
+        "filename": {"const": "raw.h5"},
+        "layout_version": {"const": 1},
+        "dataset_path": {"const": "/raw/samples"},
+        "dtype": {"const": "float64-le"},
+        "axis_order": {"const": ["channel", "sample_index"]},
+        "chunk_shape": {
+          "type": "array", "minItems": 2, "maxItems": 2,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "compression": {"const": "none"},
+        "chunk_checksum": {"const": "fletcher32"},
+        "swmr": {"const": true}
+      }
+    },
+    "event_schema_version": {"const": 1},
+    "logical_digest_version": {"const": 1},
+    "session": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "session_id", "experiment_name", "experiment_slug", "parent_path",
+        "created_path", "created_at", "timezone", "completion_state",
+        "completion_reason", "acquisition_started_at", "acquisition_ended_at"
+      ],
+      "properties": {
+        "session_id": {"type": "string", "minLength": 1},
+        "session_type": {"enum": ["experiment", "hardware-qualification", "raw-diagnostic"]},
+        "experiment_mode": {"enum": ["production", "accelerometer_commissioning"]},
+        "experiment_name": {"type": "string", "minLength": 1},
+        "experiment_slug": {"type": "string", "minLength": 1},
+        "parent_path": {"type": "string"},
+        "created_path": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "timezone": {"const": "UTC"},
+        "completion_state": {
+          "enum": ["initializing", "recording", "finalizing", "completed", "stopped", "faulted", "interrupted", "corrupt"]
+        },
+        "completion_reason": {"type": ["string", "null"]},
+        "acquisition_started_at": {"type": ["string", "null"], "format": "date-time"},
+        "acquisition_ended_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "software": {"type": "object", "additionalProperties": true},
+    "hardware": {"type": "object", "additionalProperties": true},
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["requested_sample_rate_hz", "actual_sample_rate_hz", "ordered_channel_ids", "ordered_channel_units", "sample_dtype", "source_classification"],
+      "properties": {
+        "requested_sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "actual_sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "ordered_channel_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "ordered_channel_units": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "sample_dtype": {"const": "float64"},
+        "source_classification": {"const": "unconditioned_voltage"}
+      }
+    },
+    "channels": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "processing_recipe": {"type": "object", "additionalProperties": true},
+    "counts": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["acquired_samples_per_channel", "recording_accepted_samples_per_channel", "persisted_samples_per_channel", "common_synchronized_samples", "event_count", "warning_count", "fault_count"],
+      "properties": {
+        "acquired_samples_per_channel": {"type": "integer", "minimum": 0},
+        "recording_accepted_samples_per_channel": {"type": "integer", "minimum": 0},
+        "persisted_samples_per_channel": {"type": "integer", "minimum": 0},
+        "common_synchronized_samples": {"type": "integer", "minimum": 0},
+        "event_count": {"type": "integer", "minimum": 0},
+        "warning_count": {"type": "integer", "minimum": 0},
+        "fault_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "checkpoint": {"type": "object", "additionalProperties": true},
+    "integrity": {"type": "object", "additionalProperties": true},
+    "fault": {"type": ["object", "null"]},
+    "recovery": {"type": ["object", "null"]},
+    "qualification": {"type": ["object", "null"]},
+    "diagnostic_authorization": {"type": ["object", "null"], "additionalProperties": true},
+    "open_acquisition": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "required": [
+        "monitor_run_id",
+        "monitor_started_at",
+        "configured_logical_channels",
+        "configured_physical_channels",
+        "selected_channel_id",
+        "source_start_sample_index",
+        "source_stop_sample_index",
+        "local_sample_index_origin",
+        "local_to_source_index_mapping",
+        "record_requested_at",
+        "stop_requested_at",
+        "maximum_history_seconds",
+        "visible_window_seconds",
+        "buffer_policy"
+      ],
+      "properties": {
+        "monitor_run_id": {"type": "string", "minLength": 1},
+        "monitor_started_at": {"type": "string", "format": "date-time"},
+        "configured_logical_channels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "configured_physical_channels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "selected_channel_id": {"type": "string", "minLength": 1},
+        "recorded_channel_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "recorded_channel_units": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "source_start_sample_index": {"type": "integer", "minimum": 0},
+        "source_stop_sample_index": {"type": ["integer", "null"], "minimum": 0},
+        "local_sample_index_origin": {"const": 0},
+        "local_to_source_index_mapping": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["local_origin", "source_origin", "scale"],
+          "properties": {
+            "local_origin": {"const": 0},
+            "source_origin": {"type": "integer", "minimum": 0},
+            "scale": {"const": 1}
+          }
+        },
+        "record_requested_at": {"type": "string", "format": "date-time"},
+        "stop_requested_at": {"type": ["string", "null"], "format": "date-time"},
+        "maximum_history_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "visible_window_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "buffer_policy": {"const": "bounded-overwrite-oldest-not-recorded"}
+      }
+    }
+  }
+}

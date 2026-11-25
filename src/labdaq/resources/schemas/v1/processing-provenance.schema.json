@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.invalid/schemas/v1/processing-provenance.schema.json",
+  "title": "LabDAQ processing provenance version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "provenance_hash", "source_session_id", "source_completion_state",
+    "source_raw_digest", "source_range", "ordered_channel_ids", "sample_rate_hz",
+    "calibration_ids", "calibration_hashes", "calibration_qualities", "recipe_id",
+    "recipe_version", "recipe_hash", "processing_mode", "application_version",
+    "numpy_version", "scipy_version", "output_units", "notices", "algorithm_details"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "provenance_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_session_id": {"type": "string"},
+    "source_completion_state": {"type": "string"},
+    "source_raw_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_sample_index", "stop_sample_index"],
+      "properties": {
+        "start_sample_index": {"type": "integer", "minimum": 0},
+        "stop_sample_index": {"type": "integer", "minimum": 0}
+      }
+    },
+    "ordered_channel_ids": {"type": "array", "items": {"type": "string"}},
+    "sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+    "calibration_ids": {"type": "array", "items": {"type": "string"}},
+    "calibration_hashes": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "calibration_qualities": {
+      "type": "array",
+      "items": {"enum": ["traceable", "nominal", "externally_validated", "synthetic"]}
+    },
+    "recipe_id": {"type": "string"},
+    "recipe_version": {"type": "string"},
+    "recipe_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "processing_mode": {"enum": ["live", "replay"]},
+    "application_version": {"type": "string"},
+    "numpy_version": {"type": "string"},
+    "scipy_version": {"type": "string"},
+    "output_units": {"type": "array", "items": {"type": "string"}},
+    "notices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code", "severity", "message", "channel_id", "start_sample_index",
+          "stop_sample_index"
+        ],
+        "properties": {
+          "code": {"type": "string", "pattern": "^DAQ\\.PROCESSING\\."},
+          "severity": {"type": "string"},
+          "message": {"type": "string"},
+          "channel_id": {"type": ["string", "null"]},
+          "start_sample_index": {"type": ["integer", "null"], "minimum": 0},
+          "stop_sample_index": {"type": ["integer", "null"], "minimum": 0}
+        }
+      }
+    },
+    "algorithm_details": {"type": "object"}
+  }
+}

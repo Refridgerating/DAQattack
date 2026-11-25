@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.local/schemas/v1/simulator-scenario.schema.json",
+  "title": "LabDAQ simulator scenario version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "scenario_revision",
+    "name",
+    "description",
+    "generator_version",
+    "seed",
+    "pacing_mode",
+    "channel_signals",
+    "fault_schedule"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "scenario_id": {"$ref": "#/$defs/identifier"},
+    "scenario_revision": {"type": "integer", "minimum": 1},
+    "name": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "generator_version": {"type": "string", "minLength": 1},
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "pacing_mode": {"enum": ["immediate", "real_time"]},
+    "channel_signals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/channel"}
+    },
+    "fault_schedule": {
+      "type": "array",
+      "items": {"oneOf": [
+        {"$ref": "#/$defs/clipping"},
+        {"$ref": "#/$defs/dropout"},
+        {"$ref": "#/$defs/read_delay"},
+        {"$ref": "#/$defs/disconnect"},
+        {"$ref": "#/$defs/nonfinite"},
+        {"$ref": "#/$defs/frozen"},
+        {"$ref": "#/$defs/source_index"},
+        {"$ref": "#/$defs/stale_read"},
+        {"$ref": "#/$defs/channel_delay"},
+        {"$ref": "#/$defs/crosstalk"}
+      ]}
+    },
+    "expected_reference_values": {"type": ["object", "null"]},
+    "notes": {"type": ["string", "null"]},
+    "self_test_supported": {"type": "boolean"},
+    "self_test_passed": {"type": "boolean"},
+    "topology": {"$ref": "#/$defs/topology"}
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+    },
+    "nonnegative_integer": {"type": "integer", "minimum": 0},
+    "interval": {
+      "properties": {
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    },
+    "topology": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "device_present": {"type": "boolean"},
+        "module_present": {"type": "boolean"},
+        "device_model": {"type": "string", "minLength": 1},
+        "device_serial_number": {"type": "string", "minLength": 1},
+        "module_model": {"type": "string", "minLength": 1},
+        "module_serial_number": {"type": "string", "minLength": 1},
+        "maximum_sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "input_min_v": {"type": "number"},
+        "input_max_v": {"type": "number"}
+      }
+    },
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel_id", "raw_unit", "bias_v", "components"],
+      "properties": {
+        "channel_id": {"$ref": "#/$defs/identifier"},
+        "raw_unit": {"const": "V"},
+        "bias_v": {"type": "number"},
+        "components": {
+          "type": "array",
+          "items": {"oneOf": [
+            {"$ref": "#/$defs/sine"},
+            {"$ref": "#/$defs/impulse"},
+            {"$ref": "#/$defs/chirp"},
+            {"$ref": "#/$defs/noise"},
+            {"$ref": "#/$defs/drift"}
+          ]}
+        }
+      }
+    },
+    "sine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "component_id", "amplitude_v", "frequency_hz", "phase_rad"],
+      "properties": {
+        "type": {"const": "sine"},
+        "component_id": {"$ref": "#/$defs/identifier"},
+        "amplitude_v": {"type": "number"},
+        "frequency_hz": {"type": "number", "minimum": 0},
+        "phase_rad": {"type": "number"},
+        "offset_v": {"type": "number"},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    },
+    "impulse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "component_id",
+        "start_sample",
+        "amplitude_v",
+        "width_samples"
+      ],
+      "properties": {
+        "type": {"const": "impulse"},
+        "component_id": {"$ref": "#/$defs/identifier"},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "amplitude_v": {"type": "number"},
+        "width_samples": {"type": "integer", "minimum": 1}
+      }
+    },
+    "chirp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "component_id",
+        "start_frequency_hz",
+        "end_frequency_hz",
+        "start_sample",
+        "duration_samples",
+        "amplitude_v",
+        "initial_phase_rad"
+      ],
+      "properties": {
+        "type": {"const": "linear_chirp"},
+        "component_id": {"$ref": "#/$defs/identifier"},
+        "start_frequency_hz": {"type": "number", "minimum": 0},
+        "end_frequency_hz": {"type": "number", "minimum": 0},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "duration_samples": {"type": "integer", "minimum": 1},
+        "amplitude_v": {"type": "number"},
+        "initial_phase_rad": {"type": "number"}
+      }
+    },
+    "noise": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "component_id", "rms_v"],
+      "properties": {
+        "type": {"const": "gaussian_noise"},
+        "component_id": {"$ref": "#/$defs/identifier"},
+        "rms_v": {"type": "number", "minimum": 0},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    },
+    "drift": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "component_id",
+        "initial_offset_v",
+        "slope_v_per_second",
+        "reference_sample"
+      ],
+      "properties": {
+        "type": {"const": "linear_drift"},
+        "component_id": {"$ref": "#/$defs/identifier"},
+        "initial_offset_v": {"type": "number"},
+        "slope_v_per_second": {"type": "number"},
+        "reference_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    },
+    "clipping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "fault_id",
+        "channel_ids",
+        "minimum_v",
+        "maximum_v",
+        "start_sample"
+      ],
+      "properties": {
+        "type": {"const": "clipping"},
+        "fault_id": {"$ref": "#/$defs/identifier"},
+        "channel_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/identifier"}
+        },
+        "minimum_v": {"type": "number"},
+        "maximum_v": {"type": "number"},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    },
+    "dropout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "fault_id",
+        "start_sample",
+        "missing_samples_per_channel"
+      ],
+      "properties": {
+        "type": {"const": "dropout"},
+        "fault_id": {"$ref": "#/$defs/identifier"},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "missing_samples_per_channel": {"type": "integer", "minimum": 1},
+        "channel_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/identifier"}
+        }
+      }
+    },
+    "read_delay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "fault_id", "latency_seconds"],
+      "properties": {
+        "type": {"const": "read_delay"},
+        "fault_id": {"$ref": "#/$defs/identifier"},
+        "latency_seconds": {"type": "number", "minimum": 0},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "start_read": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_read": {"$ref": "#/$defs/nonnegative_integer"}
+      },
+      "oneOf": [
+        {"required": ["start_sample"], "not": {"required": ["start_read"]}},
+        {"required": ["start_read"], "not": {"required": ["start_sample"]}}
+      ]
+    },
+    "disconnect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "fault_id", "reconnectable"],
+      "properties": {
+        "type": {"const": "disconnect"},
+        "fault_id": {"$ref": "#/$defs/identifier"},
+        "sample_index": {"$ref": "#/$defs/nonnegative_integer"},
+        "read_sequence": {"$ref": "#/$defs/nonnegative_integer"},
+        "reconnectable": {"type": "boolean"}
+      },
+      "oneOf": [
+        {"required": ["sample_index"], "not": {"required": ["read_sequence"]}},
+        {"required": ["read_sequence"], "not": {"required": ["sample_index"]}}
+      ]
+    },
+    "nonfinite": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "fault_id", "channel_ids", "sample_index", "value"],
+      "properties": {
+        "type": {"const": "nonfinite"}, "fault_id": {"$ref": "#/$defs/identifier"},
+        "channel_ids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identifier"}},
+        "sample_index": {"$ref": "#/$defs/nonnegative_integer"},
+        "value": {"enum": ["nan", "positive-infinity", "negative-infinity"]}
+      }
+    },
+    "frozen": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "fault_id", "channel_ids", "start_sample", "stop_sample", "value_v"],
+      "properties": {
+        "type": {"const": "frozen"}, "fault_id": {"$ref": "#/$defs/identifier"},
+        "channel_ids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identifier"}},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "value_v": {"type": "number"}
+      }
+    },
+    "source_index": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "fault_id", "read_sequence", "offset_samples", "mode"],
+      "properties": {
+        "type": {"const": "source_index"}, "fault_id": {"$ref": "#/$defs/identifier"},
+        "read_sequence": {"$ref": "#/$defs/nonnegative_integer"},
+        "offset_samples": {"type": "integer", "not": {"const": 0}},
+        "mode": {"enum": ["gap", "duplicate", "reorder"]}
+      }
+    },
+    "stale_read": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "fault_id", "read_sequence"],
+      "properties": {
+        "type": {"const": "stale_read"}, "fault_id": {"$ref": "#/$defs/identifier"},
+        "read_sequence": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    },
+    "channel_delay": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "fault_id", "channel_ids", "delay_samples", "start_sample"],
+      "properties": {
+        "type": {"const": "channel_delay"}, "fault_id": {"$ref": "#/$defs/identifier"},
+        "channel_ids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identifier"}},
+        "delay_samples": {"type": "integer", "minimum": 1},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    },
+    "crosstalk": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "fault_id", "source_channel_id", "coupled_channel_ids", "gain", "start_sample"],
+      "properties": {
+        "type": {"const": "crosstalk"}, "fault_id": {"$ref": "#/$defs/identifier"},
+        "source_channel_id": {"$ref": "#/$defs/identifier"},
+        "coupled_channel_ids": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identifier"}},
+        "gain": {"type": "number"},
+        "start_sample": {"$ref": "#/$defs/nonnegative_integer"},
+        "stop_sample": {"$ref": "#/$defs/nonnegative_integer"}
+      }
+    }
+  }
+}

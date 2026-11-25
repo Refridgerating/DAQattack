@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "scenario_id": "delayed-read",
+  "scenario_revision": 1,
+  "name": "Injected read delay and timeout",
+  "description": "The second read has 0.25 seconds of virtual latency.",
+  "generator_version": "sim-v1",
+  "seed": 6,
+  "pacing_mode": "immediate",
+  "channel_signals": [
+    {"channel_id": "accel-x", "raw_unit": "V", "bias_v": 1.65, "components": []},
+    {"channel_id": "accel-y", "raw_unit": "V", "bias_v": 1.65, "components": []},
+    {"channel_id": "accel-z", "raw_unit": "V", "bias_v": 1.65, "components": []},
+    {"channel_id": "charge-signal", "raw_unit": "V", "bias_v": 0.0, "components": []}
+  ],
+  "fault_schedule": [
+    {"type": "read_delay", "fault_id": "second-read-delay", "latency_seconds": 0.25, "start_read": 1, "stop_read": 2}
+  ]
+}

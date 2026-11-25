@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "plan_id": "preflight-v1",
+  "plan_revision": 1,
+  "hardware_profile_id": null,
+  "hardware_profile_revision": null,
+  "experiment_config_hash": null,
+  "tests": [
+    {
+      "test_id": "discovery-identity", "version": 1,
+      "display_name": "Discovery and identity",
+      "purpose": "Verify the configured chassis, module, serial identities, channels, and order.",
+      "required": true, "classification": "blocking", "execution_mode": "automated",
+      "required_inputs": ["hardware-profile", "experiment-config", "live-discovery"],
+      "prerequisites": [], "declared_metrics": ["device-count", "channel-count"],
+      "limits": [], "required_confirmation_ids": [], "advisory_reason_codes": []
+    },
+    {
+      "test_id": "capability-configuration", "version": 1,
+      "display_name": "Capability and configuration",
+      "purpose": "Validate simultaneous differential voltage acquisition and storage capacity before a task starts.",
+      "required": true, "classification": "blocking", "execution_mode": "automated",
+      "required_inputs": ["hardware-profile", "experiment-config", "live-discovery", "disk-space"],
+      "prerequisites": ["discovery-identity"], "declared_metrics": ["requested-rate-hz", "channel-count", "estimated-storage-bytes"],
+      "limits": [], "required_confirmation_ids": [], "advisory_reason_codes": []
+    },
+    {
+      "test_id": "self-test-lifecycle", "version": 1,
+      "display_name": "Self-test and task lifecycle",
+      "purpose": "Exercise backend self-test and the production create, start, read, stop, cleanup lifecycle.",
+      "required": true, "classification": "blocking", "execution_mode": "automated",
+      "required_inputs": ["daq-backend"], "prerequisites": ["capability-configuration"],
+      "declared_metrics": ["self-test-supported", "self-test-passed", "cleanup-succeeded"],
+      "limits": [], "required_confirmation_ids": [], "advisory_reason_codes": []
+    },
+    {
+      "test_id": "powered-idle", "version": 1,
+      "display_name": "Powered-idle acquisition",
+      "purpose": "Measure raw voltage headroom, clipping, validity, frozen data, and bounded noise evidence.",
+      "required": true, "classification": "blocking", "execution_mode": "automated",
+      "required_inputs": ["raw-synchronized-session"], "prerequisites": ["self-test-lifecycle"],
+      "declared_metrics": ["mean-v", "median-v", "standard-deviation-v", "rms-v", "robust-noise-v", "range-utilization", "clipping-fraction", "nonfinite-count", "longest-repeated-value-run"],
+      "limits": [
+        {"limit_id": "range-utilization-warning", "comparison": "lte", "value": 0.8, "unit": "fraction", "signal_stage": "raw", "source_category": "engineering-policy", "source_reference": "DAQ-M08 section 6.4", "rationale": "Warn when generic input-range use exceeds 80 percent.", "consequence": "warning"},
+        {"limit_id": "range-utilization-failure", "comparison": "lte", "value": 0.98, "unit": "fraction", "signal_stage": "raw", "source_category": "engineering-policy", "source_reference": "DAQ-M08 section 6.4", "rationale": "Fail when generic input-range use exceeds 98 percent.", "consequence": "fail"},
+        {"limit_id": "clipping-fraction", "comparison": "lte", "value": 0.0, "unit": "fraction", "signal_stage": "raw", "source_category": "engineering-policy", "source_reference": "DAQ-M08 acquisition integrity invariant", "rationale": "Clipped source evidence is unacceptable.", "consequence": "fail"},
+        {"limit_id": "nonfinite-count", "comparison": "lte", "value": 0.0, "unit": "samples", "signal_stage": "raw", "source_category": "engineering-policy", "source_reference": "DAQ-M08 acquisition integrity invariant", "rationale": "Raw qualification evidence permits no non-finite samples.", "consequence": "fail"}
+      ],
+      "required_confirmation_ids": [], "advisory_reason_codes": ["DAQ.QUALIFICATION.RENDERING_UNAVAILABLE"]
+    },
+    {
+      "test_id": "accelerometer-bias", "version": 1,
+      "display_name": "Accelerometer bias plausibility",
+      "purpose": "Compare powered-idle accelerometer voltage with provenance-bearing bias and headroom evidence.",
+      "required": true, "classification": "advisory", "execution_mode": "automated",
+      "required_inputs": ["powered-idle", "sensor-power-evidence"], "prerequisites": ["powered-idle"],
+      "declared_metrics": ["bias-v", "headroom-v"],
+      "limits": [{"limit_id": "accelerometer-bias-lab-limit", "comparison": "between-inclusive", "value": null, "unit": "V", "signal_stage": "raw", "source_category": "unresolved", "source_reference": "lab profile required", "rationale": "The laboratory has not supplied an authoritative excitation-dependent bias interval.", "consequence": "warning"}],
+      "required_confirmation_ids": [], "advisory_reason_codes": ["DAQ.QUALIFICATION.BIAS_LIMIT_UNRESOLVED"]
+    },
+    {
+      "test_id": "charge-conditioning", "version": 1,
+      "display_name": "Conditioned charge-channel plausibility",
+      "purpose": "Verify the documented external converter and compatible NI-terminal conditioning chain.",
+      "required": true, "classification": "blocking", "execution_mode": "operator-assisted",
+      "required_inputs": ["conditioned-charge-channel", "charge-converter-evidence"], "prerequisites": ["powered-idle"],
+      "declared_metrics": ["terminal-bias-v", "range-utilization"],
+      "limits": [{"limit_id": "charge-noise-lab-limit", "comparison": "lte", "value": null, "unit": "V RMS", "signal_stage": "conditioned", "source_category": "unresolved", "source_reference": "lab profile required", "rationale": "The validated conditioner noise limit has not been supplied.", "consequence": "not-tested"}],
+      "required_confirmation_ids": ["charge-conditioning-compatible"], "advisory_reason_codes": []
+    }
+  ],
+  "acquisition_rate_hz": 50000.0,
+  "powered_idle_duration_seconds": 10.0,
+  "assisted_window_duration_seconds": 2.0,
+  "throughput_duration_seconds": 600.0,
+  "maximum_report_age_seconds": null,
+  "evidence_retention": "retain-raw"
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.local/schemas/v1/export-request.schema.json",
+  "title": "LabDAQ export request v1",
+  "type": "object",
+  "required": ["schema_version", "source_session", "product", "output_format", "channels", "sample_range", "representation", "recipe_id", "spectral_input_stage", "destination_directory", "base_name", "figure_options", "max_points", "chunk_size", "collision_policy"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source_session": {"type": "string", "minLength": 1},
+    "product": {"enum": ["raw-time-data", "calibrated-time-data", "filtered-time-data", "fft-amplitude-data", "psd-data", "time-history-figure", "overlay-figure", "fft-figure", "psd-figure"]},
+    "output_format": {"enum": ["csv", "png", "svg"]},
+    "channels": {"$ref": "plot-request.schema.json#/$defs/channels"},
+    "sample_range": {"$ref": "plot-request.schema.json#/$defs/sample_range"},
+    "representation": {"enum": ["raw", "calibrated", "filtered", "fft", "psd"]},
+    "recipe_id": {"type": ["string", "null"]},
+    "spectral_input_stage": {"enum": ["raw", "calibrated", "conditioned", null]},
+    "destination_directory": {"type": ["string", "null"]},
+    "base_name": {"type": ["string", "null"], "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "figure_options": {
+      "type": "object",
+      "required": ["schema_version", "width_inches", "height_inches", "dpi", "title", "logarithmic_y"],
+      "properties": {
+        "schema_version": {"const": 1},
+        "width_inches": {"type": "number", "exclusiveMinimum": 0},
+        "height_inches": {"type": "number", "exclusiveMinimum": 0},
+        "dpi": {"type": "integer", "minimum": 1},
+        "title": {"type": ["string", "null"]},
+        "logarithmic_y": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "max_points": {"type": "integer", "minimum": 1},
+    "chunk_size": {"type": "integer", "minimum": 1},
+    "collision_policy": {"const": "reject"}
+  },
+  "additionalProperties": false
+}

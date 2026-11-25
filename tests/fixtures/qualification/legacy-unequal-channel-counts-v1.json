@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "source": "historical separate text-file recording regression",
+  "ordered_channel_counts": [1120000, 1120000, 1100000, 1100000],
+  "expected_reason_code": "DAQ.QUALIFICATION.THROUGHPUT_CHANNEL_LENGTH_MISMATCH"
+}

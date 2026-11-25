@@ -1,0 +1,468 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.invalid/schemas/v1/experiment-config.schema.json",
+  "title": "LabDAQ experiment configuration version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_config_id",
+    "config_revision",
+    "hardware_profile_id",
+    "compatible_profile_revision",
+    "session",
+    "coordinate_frames",
+    "sensors",
+    "conditioning_chains",
+    "calibrations",
+    "channels",
+    "acquisition",
+    "draft_processing_recipe_id"
+  ],
+  "properties": {
+    "schema_version": {"enum": [1, 2]},
+    "experiment_config_id": {"$ref": "#/$defs/id"},
+    "config_revision": {"type": "integer", "minimum": 1},
+    "hardware_profile_id": {"$ref": "#/$defs/id"},
+    "compatible_profile_revision": {"type": "integer", "minimum": 1},
+    "experiment_mode": {"enum": ["production", "accelerometer_commissioning"]},
+    "session": {"$ref": "#/$defs/session"},
+    "coordinate_frames": {
+      "type": "array",
+      "minItems": 0,
+      "items": {"$ref": "#/$defs/coordinate_frame"}
+    },
+    "sensors": {
+      "type": "array",
+      "minItems": 0,
+      "items": {"$ref": "#/$defs/sensor"}
+    },
+    "conditioning_chains": {
+      "type": "array",
+      "minItems": 0,
+      "items": {"$ref": "#/$defs/conditioning_chain"}
+    },
+    "calibrations": {
+      "type": "array",
+      "minItems": 0,
+      "items": {"$ref": "#/$defs/calibration"}
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/channel"}
+    },
+    "acquisition": {"$ref": "#/$defs/acquisition"},
+    "draft_processing_recipe_id": {
+      "anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$"
+    },
+    "nullable_string": {"type": ["string", "null"]},
+    "quantity": {"enum": ["voltage", "acceleration", "charge"]},
+    "unit": {"enum": ["V", "mV", "g", "m/s^2", "pC", "nC"]},
+    "polarity": {"enum": ["positive", "negative"]},
+    "physical_channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module_id", "channel_index", "terminal_configuration"],
+      "properties": {
+        "module_id": {"$ref": "#/$defs/id"},
+        "channel_index": {"type": "integer", "minimum": 0},
+        "terminal_configuration": {"const": "differential"}
+      }
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "experiment_name",
+        "experiment_slug",
+        "description",
+        "operator",
+        "sample_id",
+        "notes",
+        "parent_output_directory"
+      ],
+      "properties": {
+        "experiment_name": {"type": "string", "minLength": 1},
+        "experiment_slug": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "description": {"type": "string", "minLength": 1},
+        "operator": {"type": "string", "minLength": 1},
+        "sample_id": {"$ref": "#/$defs/nullable_string"},
+        "notes": {"$ref": "#/$defs/nullable_string"},
+        "parent_output_directory": {"type": "string", "minLength": 1}
+      }
+    },
+    "coordinate_frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coordinate_frame_id",
+        "name",
+        "reference_description",
+        "direction_cosine_matrix"
+      ],
+      "properties": {
+        "coordinate_frame_id": {"$ref": "#/$defs/id"},
+        "name": {"type": "string", "minLength": 1},
+        "reference_description": {"type": "string", "minLength": 1},
+        "direction_cosine_matrix": {
+          "anyOf": [
+            {"type": "null"},
+            {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {"type": "number"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "sensor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sensor_id",
+        "manufacturer",
+        "model",
+        "serial_number",
+        "sensor_type",
+        "output_quantity",
+        "output_count",
+        "coordinate_frame_id",
+        "asset_tag",
+        "mounting_description",
+        "certificate_reference"
+      ],
+      "properties": {
+        "sensor_id": {"$ref": "#/$defs/id"},
+        "manufacturer": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "serial_number": {"type": "string", "minLength": 1},
+        "sensor_type": {
+          "enum": ["triaxial_accelerometer", "charge_transducer"]
+        },
+        "output_quantity": {"$ref": "#/$defs/quantity"},
+        "output_count": {"type": "integer", "minimum": 1},
+        "coordinate_frame_id": {"$ref": "#/$defs/id"},
+        "asset_tag": {"$ref": "#/$defs/nullable_string"},
+        "mounting_description": {"$ref": "#/$defs/nullable_string"},
+        "certificate_reference": {"$ref": "#/$defs/nullable_string"},
+        "sensor_power": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["excitation_source", "excitation_voltage_v", "excitation_current_ma", "source_reference", "externally_verified"],
+          "properties": {
+            "excitation_source": {"type": "string", "minLength": 1},
+            "excitation_voltage_v": {"type": ["number", "null"], "exclusiveMinimum": 0},
+            "excitation_current_ma": {"type": ["number", "null"], "exclusiveMinimum": 0},
+            "source_reference": {"type": "string", "minLength": 1},
+            "externally_verified": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "conditioning_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conditioning_chain_id",
+        "description",
+        "components",
+        "input_quantity",
+        "input_unit",
+        "output_quantity",
+        "output_unit",
+        "supply_description",
+        "calibration_reference",
+        "polarity"
+      ],
+      "properties": {
+        "conditioning_chain_id": {"$ref": "#/$defs/id"},
+        "description": {"type": "string", "minLength": 1},
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "input_quantity": {"$ref": "#/$defs/quantity"},
+        "input_unit": {"$ref": "#/$defs/unit"},
+        "output_quantity": {"$ref": "#/$defs/quantity"},
+        "output_unit": {"$ref": "#/$defs/unit"},
+        "supply_description": {"$ref": "#/$defs/nullable_string"},
+        "calibration_reference": {"type": "string", "minLength": 1},
+        "polarity": {"$ref": "#/$defs/polarity"},
+        "charge_converter": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["manufacturer", "model", "serial_number", "nominal_charge_sensitivity", "sensitivity_unit", "output_polarity", "excitation_source", "excitation_current_ma", "source_reference"],
+          "properties": {
+            "manufacturer": {"type": "string", "minLength": 1},
+            "model": {"type": "string", "minLength": 1},
+            "serial_number": {"$ref": "#/$defs/nullable_string"},
+            "nominal_charge_sensitivity": {"type": "number", "exclusiveMinimum": 0},
+            "sensitivity_unit": {"enum": ["V/pC", "mV/pC", "V/nC", "mV/nC"]},
+            "output_polarity": {"$ref": "#/$defs/polarity"},
+            "excitation_source": {"type": "string", "minLength": 1},
+            "excitation_current_ma": {"type": "number", "exclusiveMinimum": 0},
+            "source_reference": {"type": "string", "minLength": 1}
+          }
+        },
+        "ni_terminal_conditioning": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["stage_description", "bias_removal_documented", "expected_bias_v", "bias_tolerance_v", "dynamic_min_v", "dynamic_max_v", "source_reference"],
+          "properties": {
+            "stage_description": {"type": "string", "minLength": 1},
+            "bias_removal_documented": {"type": "boolean"},
+            "expected_bias_v": {"type": "number"},
+            "bias_tolerance_v": {"type": "number", "minimum": 0},
+            "dynamic_min_v": {"type": "number"},
+            "dynamic_max_v": {"type": "number"},
+            "source_reference": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "calibration_id",
+        "calibration_model",
+        "input_quantity",
+        "input_unit",
+        "output_quantity",
+        "output_unit",
+        "sensitivity_value",
+        "sensitivity_unit",
+        "polarity",
+        "source_kind",
+        "source_reference",
+        "effective_date",
+        "expiration_date",
+        "certificate_identifier",
+        "conditions",
+        "notes"
+      ],
+      "properties": {
+        "calibration_id": {"$ref": "#/$defs/id"},
+        "calibration_model": {"const": "linear_sensitivity"},
+        "input_quantity": {"$ref": "#/$defs/quantity"},
+        "input_unit": {"$ref": "#/$defs/unit"},
+        "output_quantity": {"$ref": "#/$defs/quantity"},
+        "output_unit": {"$ref": "#/$defs/unit"},
+        "sensitivity_value": {"type": "number", "exclusiveMinimum": 0},
+        "sensitivity_unit": {
+          "enum": [
+            "V/g",
+            "mV/g",
+            "V/(m/s^2)",
+            "mV/(m/s^2)",
+            "V/pC",
+            "mV/pC",
+            "V/nC",
+            "mV/nC"
+          ]
+        },
+        "polarity": {"$ref": "#/$defs/polarity"},
+        "source_kind": {
+          "enum": [
+            "certificate",
+            "manufacturer_nominal",
+            "external_validation",
+            "test_fixture",
+            "operator_transcribed"
+          ]
+        },
+        "source_reference": {"type": "string", "minLength": 1},
+        "effective_date": {
+          "anyOf": [
+            {"type": "string", "format": "date"},
+            {"type": "null"}
+          ]
+        },
+        "expiration_date": {
+          "anyOf": [
+            {"type": "string", "format": "date"},
+            {"type": "null"}
+          ]
+        },
+        "certificate_identifier": {"$ref": "#/$defs/nullable_string"},
+        "conditions": {"$ref": "#/$defs/nullable_string"},
+        "notes": {"$ref": "#/$defs/nullable_string"}
+        ,"input_offset": {"type": ["number", "null"]}
+        ,"valid_input_min": {"type": ["number", "null"]}
+        ,"valid_input_max": {"type": ["number", "null"]}
+        ,"valid_output_min": {"type": ["number", "null"]}
+        ,"valid_output_max": {"type": ["number", "null"]}
+        ,"validated_frequency_min_hz": {"type": ["number", "null"], "exclusiveMinimum": 0}
+        ,"validated_frequency_max_hz": {"type": ["number", "null"], "exclusiveMinimum": 0}
+        ,"extended_frequency_min_hz": {"type": ["number", "null"], "exclusiveMinimum": 0}
+        ,"extended_frequency_max_hz": {"type": ["number", "null"], "exclusiveMinimum": 0}
+        ,"uncertainty": {"$ref": "#/$defs/nullable_string"}
+        ,"transcription_timestamp": {
+          "anyOf": [
+            {"type": "string", "format": "date-time"},
+            {"type": "null"}
+          ]
+        },
+        "missing_provenance_fields": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "characterization_session_ids": {"type": "array", "items": {"$ref": "#/$defs/id"}, "uniqueItems": true},
+        "owner_approval": {"$ref": "#/$defs/nullable_string"}
+      }
+    },
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel_id",
+        "logical_name",
+        "channel_role",
+        "physical_channel",
+        "channel_order",
+        "raw_quantity",
+        "raw_unit",
+        "engineering_quantity",
+        "engineering_unit",
+        "sensor_id",
+        "sensor_output_axis",
+        "experiment_axis_label",
+        "mounting_notes",
+        "calibration_id",
+        "conditioning_chain_id",
+        "requested_input_min",
+        "requested_input_max",
+        "enabled"
+      ],
+      "properties": {
+        "channel_id": {"$ref": "#/$defs/id"},
+        "logical_name": {"type": "string", "minLength": 1},
+        "channel_role": {
+          "enum": [
+            "accelerometer_x",
+            "accelerometer_y",
+            "accelerometer_z",
+            "conditioned_charge",
+            "diagnostic_raw_voltage"
+          ]
+        },
+        "physical_channel": {"$ref": "#/$defs/physical_channel"},
+        "channel_order": {"type": "integer", "minimum": 0},
+        "raw_quantity": {"$ref": "#/$defs/quantity"},
+        "raw_unit": {"$ref": "#/$defs/unit"},
+        "engineering_quantity": {"$ref": "#/$defs/quantity"},
+        "engineering_unit": {"$ref": "#/$defs/unit"},
+        "sensor_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+        "sensor_output_axis": {
+          "type": ["string", "null"],
+          "enum": ["x", "y", "z", null]
+        },
+        "experiment_axis_label": {"$ref": "#/$defs/nullable_string"},
+        "mounting_notes": {"$ref": "#/$defs/nullable_string"},
+        "calibration_id": {
+          "anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]
+        },
+        "processing_disposition": {
+          "enum": ["calibrated", "raw_only_diagnostic"]
+        },
+        "conditioning_chain_id": {
+          "anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]
+        },
+        "requested_input_min": {"type": "number"},
+        "requested_input_max": {"type": "number"},
+        "enabled": {"type": "boolean"}
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "source", "edge", "pretrigger_samples"],
+      "properties": {
+        "mode": {"enum": ["immediate", "digital_edge"]},
+        "source": {"$ref": "#/$defs/nullable_string"},
+        "edge": {
+          "type": ["string", "null"],
+          "enum": ["rising", "falling", null]
+        },
+        "pretrigger_samples": {"type": "integer", "minimum": 0}
+      }
+    },
+    "chunk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["samples_per_channel", "read_timeout_seconds"],
+      "properties": {
+        "samples_per_channel": {"type": "integer", "minimum": 1},
+        "read_timeout_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "stop_timeout_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 5.0
+        },
+        "recording_queue_capacity_chunks": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 32
+        },
+        "recording_backpressure_timeout_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 2.0
+        },
+        "display_queue_capacity_chunks": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 2
+        },
+        "progress_event_interval_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 0.5
+        }
+      }
+    },
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_rate_hz",
+        "sampling_mode",
+        "requested_duration_seconds",
+        "channel_ids",
+        "trigger",
+        "chunk_config"
+      ],
+      "properties": {
+        "sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "sampling_mode": {"enum": ["finite", "continuous"]},
+        "requested_duration_seconds": {
+          "type": ["number", "null"],
+          "exclusiveMinimum": 0
+        },
+        "channel_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/id"}
+        },
+        "trigger": {"$ref": "#/$defs/trigger"},
+        "chunk_config": {"$ref": "#/$defs/chunk"}
+      }
+    }
+  }
+}

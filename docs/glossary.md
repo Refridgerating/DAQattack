@@ -1,0 +1,44 @@
+# LabDAQ Glossary
+
+- **Acquired count:** Samples successfully returned by a DAQ adapter.
+- **Acquisition engine:** Headless application service owning session state, one read worker, continuity, stop coordination, and recording/display fan-out.
+- **Acquisition state:** Application-level idle/configured/armed/running/stopping/completed/faulted state, distinct from an adapter lifecycle.
+- **Calibrated data:** Raw values converted through traceable calibration.
+- **Calibration quality:** Explicit classification of a resolved conversion as traceable, nominal, externally validated, or synthetic.
+- **Conditioning chain:** Ordered external electronics and provenance connecting a transducer to a DAQ voltage input.
+- **Conditioned data:** Raw or calibrated values transformed by a declared recipe.
+- **Coordinate frame:** Named physical basis in which a sensor output axis is defined.
+- **Data chunk:** Bounded sequential sample frames, conventionally `[channels, samples]`.
+- **DAQ adapter lifecycle:** Backend-local idle/configured/running/stopped/faulted/closed state, distinct from the experiment state machine.
+- **DAQ port:** Hardware-independent discovery, validation, configuration, read, health, and cleanup contract.
+- **Diagnostics:** Software-environment and optional-dependency information.
+- **Displayed count:** Samples presented to the disposable live-view consumer.
+- **Display supersession:** Replacement of the oldest unpublished whole display chunk; permitted and counted independently of recording delivery.
+- **Experiment configuration:** Versioned operator-selected acquisition and metadata settings.
+- **Export artifact:** One completed derived primary file plus its checksummed version-1 metadata sidecar.
+- **Export manifest:** Terminal version-1 job record linking requests, artifacts, progress, warnings, faults, and source identity.
+- **Fault:** Condition changing run eligibility, completion, or data trust.
+- **Hardware profile:** Versioned declaration of expected devices and capabilities.
+- **Logical channel:** Experiment identity such as `accel_x` or `charge_signal`.
+- **Logical-data digest:** Versioned checksum of canonical synchronized sample-frame bytes, independent of acquisition and replay chunk boundaries.
+- **Persisted count:** Samples durably accepted by the authoritative recorder.
+- **Plot bundle:** Bounded renderer-neutral series plus source, range, calibration, recipe, unit, and decimation provenance.
+- **Recording-accepted count:** Samples successfully placed on M04's lossless recording stream; not yet a persisted count until M05 storage acknowledges them.
+- **Physical channel:** Driver-facing identifier such as `Dev1/ai0`.
+- **Processing recipe:** Versioned declaration of reproducible processing stages.
+- **Processing provenance:** Deterministic identity of a derived result, including source digest/range, calibration and recipe hashes, realized algorithms, implementation versions, units, quality, and notices.
+- **Recovered verified prefix:** Explicitly classified synchronized extent of an interrupted session that passed full M05 verification and is eligible for replay processing.
+- **Qualification:** Evidence that a configured hardware chain is ready for a stated use.
+- **Raw data:** Values returned by the DAQ before engineering conversion or conditioning.
+- **Sample:** One scalar measurement from one channel at one sample index.
+- **Sample frame:** Synchronized samples from all active channels at one sample index.
+- **Sample index:** Monotonic integer position in the acquisition stream.
+- **Sample range:** Non-empty half-open interval `[start_index, stop_index)` resolved against one authoritative sample rate.
+- **Schema version:** Explicit wire-format version checked before a document is constructed or migrated.
+- **Session:** One configured acquisition attempt and its records and completion state.
+- **Session checkpoint:** Latest manifest count and digest made durable with synchronized stream flushes and atomic metadata replacement.
+- **Session recovery:** Explicit metadata-only classification of an abandoned nonterminal session to a verified immutable synchronized prefix.
+- **Synchronized extent:** Longest sample-index range for which every ordered channel has one complete readable sample frame.
+- **Simulator scenario:** Versioned synthetic signal and fault declaration evaluated from absolute sample indices.
+- **Synthetic calibration:** Clearly labeled deterministic test data that is not physical calibration evidence.
+- **Warning:** Visible condition that does not necessarily invalidate a run.

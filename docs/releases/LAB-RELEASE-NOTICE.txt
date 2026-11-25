@@ -1,0 +1,14 @@
+LABDAQ 1.0.0 LABORATORY PACKAGE
+
+Copyright (c) 2026. All rights reserved. The accompanying LICENSE states the
+terms applicable to this proprietary software.
+
+The application displays and records raw voltage. Its simulator and software
+tests do not establish physical channel mapping, wiring, grounding, sensor
+power, input compatibility, calibration, or the performance of external
+conditioning. Physical NI hardware behavior has not yet been verified on the
+target cDAQ-9171 / NI-9239 system.
+
+Preserve and report acquisition or recording faults, suspected sample loss,
+count mismatches, and partial sessions. See the installed release notes and
+operator guide for installation, monitoring, recording, and review instructions.

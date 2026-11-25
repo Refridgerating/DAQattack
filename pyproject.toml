@@ -1,0 +1,199 @@
+[build-system]
+requires = ["setuptools>=77,<84"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "labdaq"
+version = "1.0.0"
+description = "Dependable laboratory data acquisition foundations"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = "LicenseRef-Proprietary"
+license-files = ["LICENSE"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Environment :: Console",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering",
+]
+dependencies = ["jsonschema>=4.26,<5"]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.5,<2",
+  "import-linter>=2.13,<3",
+  "mypy>=2.3,<3",
+  "matplotlib>=3.11,<3.12",
+  "h5py>=3.16,<4",
+  "nptdms>=1.11,<2",
+  "numpy>=2.3,<2.5",
+  "pytest>=9.1,<10",
+  "pytest-cov>=7.1,<8",
+  "pytest-qt>=4.5,<5",
+  "PySide6>=6.9,<7",
+  "pyqtgraph>=0.14,<1",
+  "ruff>=0.15,<1",
+  "types-jsonschema>=4.26,<5",
+]
+simulated = ["numpy>=2.3,<2.5"]
+analysis = [
+  "numpy>=2.3,<2.5",
+  "scipy>=1.17,<1.19",
+]
+export = ["matplotlib>=3.11,<3.12"]
+storage = [
+  "h5py>=3.16,<4",
+  "numpy>=2.3,<2.5",
+]
+tdms = ["nptdms>=1.11,<2"]
+ni = ["nidaqmx>=1.5,<2"]
+gui = [
+  "PySide6>=6.9,<7",
+  "pyqtgraph>=0.14,<1",
+]
+release = [
+  "matplotlib>=3.11,<3.12",
+  "h5py>=3.16,<4",
+  "nptdms>=1.11,<2",
+  "nidaqmx>=1.5,<2",
+  "numpy>=2.3,<2.5",
+  "PySide6>=6.9,<7",
+  "pyqtgraph>=0.14,<1",
+  "scipy>=1.17,<1.19",
+  "pyinstaller==6.22.2",
+]
+full = [
+  "numpy>=2.3,<2.5",
+  "scipy>=1.17,<1.19",
+  "h5py>=3.16,<4",
+  "nptdms>=1.11,<2",
+  "nidaqmx>=1.5,<2",
+  "matplotlib>=3.11,<3.12",
+  "PySide6>=6.9,<7",
+  "pyqtgraph>=0.14,<1",
+  "pyinstaller>=6.21,<7",
+]
+
+[project.scripts]
+labdaq = "labdaq.cli.main:main"
+labdaq-gui = "labdaq.gui.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"labdaq.resources" = ["**/*.json"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["Data", ".tools", "references/legacy"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "TRY", "TCH"]
+ignore = ["TRY003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["B011"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src/labdaq"]
+exclude = ["references"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+  "--strict-config",
+  "--strict-markers",
+  "--cov=labdaq",
+  "--cov-report=term-missing",
+  "--cov-fail-under=85",
+]
+filterwarnings = ["error"]
+markers = [
+  "architecture: import-boundary and side-effect tests",
+  "hardware: explicit opt-in tests requiring physical NI hardware",
+  "integration: command and package integration tests",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["labdaq"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.importlinter]
+root_packages = ["labdaq"]
+
+[[tool.importlinter.contracts]]
+name = "Domain does not depend on outer layers"
+type = "forbidden"
+source_modules = ["labdaq.domain"]
+forbidden_modules = [
+  "labdaq.application",
+  "labdaq.ports",
+  "labdaq.processing",
+  "labdaq.storage",
+  "labdaq.adapters",
+  "labdaq.cli",
+  "labdaq.gui",
+  "labdaq.bootstrap",
+]
+
+[[tool.importlinter.contracts]]
+name = "Ports do not depend on implementations or presentation"
+type = "forbidden"
+source_modules = ["labdaq.ports"]
+forbidden_modules = [
+  "labdaq.application",
+  "labdaq.processing",
+  "labdaq.storage",
+  "labdaq.adapters",
+  "labdaq.cli",
+  "labdaq.gui",
+  "labdaq.bootstrap",
+]
+
+[[tool.importlinter.contracts]]
+name = "Application does not depend on concrete implementations"
+type = "forbidden"
+source_modules = ["labdaq.application"]
+forbidden_modules = [
+  "labdaq.processing",
+  "labdaq.storage",
+  "labdaq.adapters",
+  "labdaq.cli",
+  "labdaq.gui",
+  "labdaq.bootstrap",
+]
+
+[[tool.importlinter.contracts]]
+name = "Simulated DAQ does not depend on NI, storage, processing, or presentation"
+type = "forbidden"
+source_modules = ["labdaq.adapters.simulated"]
+forbidden_modules = [
+  "labdaq.adapters.ni",
+  "labdaq.adapters.tdms",
+  "labdaq.processing",
+  "labdaq.storage",
+  "labdaq.cli",
+  "labdaq.gui",
+]
+
+[[tool.importlinter.contracts]]
+name = "Processing implementation does not depend on infrastructure or presentation"
+type = "forbidden"
+source_modules = ["labdaq.processing"]
+forbidden_modules = [
+  "labdaq.application",
+  "labdaq.storage",
+  "labdaq.adapters",
+  "labdaq.cli",
+  "labdaq.gui",
+]

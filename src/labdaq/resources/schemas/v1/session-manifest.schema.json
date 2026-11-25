@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labdaq.invalid/schemas/v1/session-manifest.schema.json",
+  "title": "LabDAQ durable session manifest version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "tdms_layout_version",
+    "event_schema_version",
+    "logical_digest_version",
+    "session",
+    "software",
+    "hardware",
+    "acquisition",
+    "channels",
+    "processing_recipe",
+    "counts",
+    "checkpoint",
+    "integrity",
+    "fault",
+    "recovery"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "tdms_layout_version": {"const": 1},
+    "event_schema_version": {"const": 1},
+    "logical_digest_version": {"const": 1},
+    "session": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "session_id", "experiment_name", "experiment_slug", "parent_path",
+        "created_path", "created_at", "timezone", "completion_state",
+        "completion_reason", "acquisition_started_at", "acquisition_ended_at"
+      ],
+      "properties": {
+        "session_id": {"type": "string", "minLength": 1},
+        "session_type": {"enum": ["experiment", "hardware-qualification", "raw-diagnostic"]},
+        "experiment_mode": {"enum": ["production", "accelerometer_commissioning"]},
+        "experiment_name": {"type": "string", "minLength": 1},
+        "experiment_slug": {"type": "string", "minLength": 1},
+        "parent_path": {"type": "string"},
+        "created_path": {"type": "string"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "timezone": {"const": "UTC"},
+        "completion_state": {
+          "enum": ["initializing", "recording", "finalizing", "completed", "stopped", "faulted", "interrupted", "corrupt"]
+        },
+        "completion_reason": {"type": ["string", "null"]},
+        "acquisition_started_at": {"type": ["string", "null"], "format": "date-time"},
+        "acquisition_ended_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "software": {"type": "object", "additionalProperties": true},
+    "hardware": {"type": "object", "additionalProperties": true},
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["requested_sample_rate_hz", "actual_sample_rate_hz", "ordered_channel_ids", "ordered_channel_units", "sample_dtype", "source_classification"],
+      "properties": {
+        "requested_sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "actual_sample_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "ordered_channel_ids": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "ordered_channel_units": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "sample_dtype": {"const": "float64"},
+        "source_classification": {"const": "unconditioned_voltage"}
+      }
+    },
+    "channels": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "processing_recipe": {"type": "object", "additionalProperties": true},
+    "counts": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["acquired_samples_per_channel", "recording_accepted_samples_per_channel", "persisted_samples_per_channel", "common_synchronized_samples", "event_count", "warning_count", "fault_count"],
+      "properties": {
+        "acquired_samples_per_channel": {"type": "integer", "minimum": 0},
+        "recording_accepted_samples_per_channel": {"type": "integer", "minimum": 0},
+        "persisted_samples_per_channel": {"type": "integer", "minimum": 0},
+        "common_synchronized_samples": {"type": "integer", "minimum": 0},
+        "event_count": {"type": "integer", "minimum": 0},
+        "warning_count": {"type": "integer", "minimum": 0},
+        "fault_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "checkpoint": {"type": "object", "additionalProperties": true},
+    "integrity": {"type": "object", "additionalProperties": true},
+    "fault": {"type": ["object", "null"]},
+    "recovery": {"type": ["object", "null"]},
+    "qualification": {"type": ["object", "null"]},
+    "diagnostic_authorization": {
+      "type": ["object", "null"],
+      "properties": {
+        "authorization_scope": {"const": "raw-voltage-diagnostic-only"},
+        "operator": {"type": "string", "minLength": 1},
+        "authorized_at": {"type": "string", "format": "date-time"},
+        "measured_supply_voltage_v": {"type": "number", "minimum": 2.8, "maximum": 5.5},
+        "polarity_confirmed": {"const": true},
+        "ai3_connection": {"enum": ["disconnected", "connected-verified"]},
+        "hardware_validation_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

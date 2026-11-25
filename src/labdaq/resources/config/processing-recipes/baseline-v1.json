@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "recipe_id": "baseline",
+  "recipe_version": "v1",
+  "name": "Baseline v1",
+  "status": "active",
+  "execution_class": "causal",
+  "initialization_policy": "first_sample_steady_state",
+  "stages": [
+    {
+      "stage_id": "affine-calibration",
+      "kind": "affine_calibration",
+      "applies_to": ["accelerometer_x", "accelerometer_y", "accelerometer_z", "conditioned_charge"],
+      "causal": true,
+      "order": null,
+      "cutoff_hz": null
+    },
+    {
+      "stage_id": "accelerometer-high-pass",
+      "kind": "butterworth_high_pass",
+      "applies_to": ["accelerometer_x", "accelerometer_y", "accelerometer_z"],
+      "causal": true,
+      "order": 4,
+      "cutoff_hz": 1.0
+    },
+    {
+      "stage_id": "accelerometer-low-pass",
+      "kind": "butterworth_low_pass",
+      "applies_to": ["accelerometer_x", "accelerometer_y", "accelerometer_z"],
+      "causal": true,
+      "order": 6,
+      "cutoff_hz": 12000.0
+    }
+  ],
+  "metrics": {"source_stage": "conditioned", "clipping_margin_v": 0.0},
+  "fft": {
+    "source_stage": "conditioned",
+    "detrend": "mean",
+    "window": "hann-periodic",
+    "normalization": "coherent-gain-one-sided-amplitude",
+    "maximum_samples_per_channel": 1048576
+  },
+  "psd": {
+    "source_stage": "conditioned",
+    "segment_duration_seconds": 1.0,
+    "overlap_fraction": 0.5,
+    "detrend": "constant",
+    "window": "hann-periodic",
+    "scaling": "density"
+  }
+}

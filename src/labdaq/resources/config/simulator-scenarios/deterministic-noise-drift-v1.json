@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "scenario_id": "deterministic-noise-drift",
+  "scenario_revision": 1,
+  "name": "Deterministic noise and drift",
+  "description": "Independent keyed Gaussian streams with analytical linear drift.",
+  "generator_version": "sim-v1",
+  "seed": 42,
+  "pacing_mode": "immediate",
+  "channel_signals": [
+    {"channel_id": "accel-x", "raw_unit": "V", "bias_v": 1.65, "components": [{"type": "gaussian_noise", "component_id": "noise-x", "rms_v": 0.001}, {"type": "linear_drift", "component_id": "drift-x", "initial_offset_v": 0.0, "slope_v_per_second": 0.001, "reference_sample": 0}]},
+    {"channel_id": "accel-y", "raw_unit": "V", "bias_v": 1.65, "components": [{"type": "gaussian_noise", "component_id": "noise-y", "rms_v": 0.001}, {"type": "linear_drift", "component_id": "drift-y", "initial_offset_v": 0.0, "slope_v_per_second": -0.001, "reference_sample": 0}]},
+    {"channel_id": "accel-z", "raw_unit": "V", "bias_v": 1.65, "components": [{"type": "gaussian_noise", "component_id": "noise-z", "rms_v": 0.002}]},
+    {"channel_id": "charge-signal", "raw_unit": "V", "bias_v": 0.0, "components": [{"type": "gaussian_noise", "component_id": "noise-charge", "rms_v": 0.005}]}
+  ],
+  "fault_schedule": []
+}

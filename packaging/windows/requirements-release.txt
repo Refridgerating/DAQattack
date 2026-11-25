@@ -1,0 +1,14 @@
+# Direct release inputs are pinned; resolved transitive versions are retained in build-info.json.
+setuptools==79.0.1
+jsonschema==4.26.0
+numpy==2.4.6
+scipy==1.17.1
+h5py==3.16.0
+nptdms==1.11.0
+nidaqmx==1.6.0
+nitypes==1.1.0
+hightime==1.0.0
+matplotlib==3.11.1
+PySide6==6.11.1
+pyqtgraph==0.14.0
+pyinstaller==6.22.2

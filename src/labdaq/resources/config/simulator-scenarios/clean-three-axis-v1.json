@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "scenario_id": "clean-three-axis",
+  "scenario_revision": 1,
+  "name": "Clean three-axis commissioning acquisition",
+  "description": "Three deterministic accelerometer-like voltages plus one raw-only ai3 diagnostic; charge is excluded.",
+  "generator_version": "sim-v1",
+  "seed": 20260728,
+  "pacing_mode": "immediate",
+  "channel_signals": [
+    {
+      "channel_id": "accel-x",
+      "raw_unit": "V",
+      "bias_v": 1.65,
+      "components": [
+        {"type": "sine", "component_id": "tone-x", "amplitude_v": 0.006914, "frequency_hz": 125.0, "phase_rad": 0.0}
+      ]
+    },
+    {
+      "channel_id": "accel-y",
+      "raw_unit": "V",
+      "bias_v": 1.65,
+      "components": [
+        {"type": "sine", "component_id": "tone-y", "amplitude_v": 0.006791, "frequency_hz": 250.0, "phase_rad": 0.7853981633974483}
+      ]
+    },
+    {
+      "channel_id": "accel-z",
+      "raw_unit": "V",
+      "bias_v": 1.65,
+      "components": [
+        {"type": "sine", "component_id": "tone-z", "amplitude_v": 0.007398, "frequency_hz": 500.0, "phase_rad": 1.5707963267948966}
+      ]
+    },
+    {
+      "channel_id": "pcb-422e03-raw-diagnostic",
+      "raw_unit": "V",
+      "bias_v": 0.0,
+      "components": [
+        {"type": "sine", "component_id": "raw-diagnostic-tone", "amplitude_v": 0.001, "frequency_hz": 80.0, "phase_rad": 0.0}
+      ]
+    }
+  ],
+  "fault_schedule": [],
+  "notes": "Synthetic commissioning fixture only; it is not physical acceptance evidence."
+}

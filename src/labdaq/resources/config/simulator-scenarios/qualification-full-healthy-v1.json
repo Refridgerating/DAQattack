@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "scenario_id": "qualification-full-healthy",
+  "scenario_revision": 1,
+  "name": "Healthy full qualification fixture",
+  "description": "Deterministic phase-addressed axis, alignment, and crosstalk evidence for the bundled full-v1 plan at 50 kS/s.",
+  "generator_version": "sim-v1",
+  "seed": 20260813,
+  "pacing_mode": "immediate",
+  "channel_signals": [
+    {
+      "channel_id": "accel-x", "raw_unit": "V", "bias_v": 1.65,
+      "components": [
+        {"type": "sine", "component_id": "idle-x", "amplitude_v": 0.002, "frequency_hz": 17.0, "phase_rad": 0.0},
+        {"type": "sine", "component_id": "stimulus-x", "amplitude_v": 0.05, "frequency_hz": 500.0, "phase_rad": 0.0, "start_sample": 700000, "stop_sample": 800000},
+        {"type": "sine", "component_id": "alignment-x", "amplitude_v": 0.05, "frequency_hz": 100.0, "phase_rad": 0.0, "start_sample": 1200000, "stop_sample": 1300000},
+        {"type": "sine", "component_id": "crosstalk-source", "amplitude_v": 0.05, "frequency_hz": 200.0, "phase_rad": 0.0, "start_sample": 1300000, "stop_sample": 1400000}
+      ]
+    },
+    {
+      "channel_id": "accel-y", "raw_unit": "V", "bias_v": 1.65,
+      "components": [
+        {"type": "sine", "component_id": "idle-y", "amplitude_v": 0.002, "frequency_hz": 19.0, "phase_rad": 0.0},
+        {"type": "sine", "component_id": "stimulus-y", "amplitude_v": 0.05, "frequency_hz": 500.0, "phase_rad": 0.0, "start_sample": 900000, "stop_sample": 1000000},
+        {"type": "sine", "component_id": "alignment-y", "amplitude_v": 0.05, "frequency_hz": 100.0, "phase_rad": 0.0, "start_sample": 1200000, "stop_sample": 1300000},
+        {"type": "sine", "component_id": "crosstalk-coupled", "amplitude_v": 0.00005, "frequency_hz": 200.0, "phase_rad": 0.0, "start_sample": 1300000, "stop_sample": 1400000}
+      ]
+    },
+    {
+      "channel_id": "accel-z", "raw_unit": "V", "bias_v": 1.65,
+      "components": [
+        {"type": "sine", "component_id": "idle-z", "amplitude_v": 0.002, "frequency_hz": 23.0, "phase_rad": 0.0},
+        {"type": "sine", "component_id": "stimulus-z", "amplitude_v": 0.05, "frequency_hz": 500.0, "phase_rad": 0.0, "start_sample": 1100000, "stop_sample": 1200000},
+        {"type": "sine", "component_id": "alignment-z", "amplitude_v": 0.05, "frequency_hz": 100.0, "phase_rad": 0.0, "start_sample": 1200000, "stop_sample": 1300000}
+      ]
+    },
+    {
+      "channel_id": "charge-signal", "raw_unit": "V", "bias_v": 0.0,
+      "components": [
+        {"type": "sine", "component_id": "idle-charge", "amplitude_v": 0.003, "frequency_hz": 29.0, "phase_rad": 0.0},
+        {"type": "sine", "component_id": "alignment-charge", "amplitude_v": 0.05, "frequency_hz": 100.0, "phase_rad": 0.0, "start_sample": 1200000, "stop_sample": 1300000}
+      ]
+    }
+  ],
+  "fault_schedule": [],
+  "expected_reference_values": {
+    "powered_idle_stop_sample": 500000,
+    "alignment_start_sample": 1200000,
+    "throughput_start_sample": 1400000
+  },
+  "notes": "Synthetic fixture only; phase indices apply to the bundled full-v1 durations at 50 kS/s."
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "scenario_id": "clipping",
+  "scenario_revision": 1,
+  "name": "Injected clipping",
+  "description": "Signals exceed declared clipping limits while acquisition continues.",
+  "generator_version": "sim-v1",
+  "seed": 4,
+  "pacing_mode": "immediate",
+  "channel_signals": [
+    {"channel_id": "accel-x", "raw_unit": "V", "bias_v": 1.65, "components": [{"type": "sine", "component_id": "clip-tone-x", "amplitude_v": 0.2, "frequency_hz": 1000.0, "phase_rad": 0.0}]},
+    {"channel_id": "accel-y", "raw_unit": "V", "bias_v": 1.65, "components": [{"type": "sine", "component_id": "clip-tone-y", "amplitude_v": 0.2, "frequency_hz": 1000.0, "phase_rad": 0.0}]},
+    {"channel_id": "accel-z", "raw_unit": "V", "bias_v": 1.65, "components": [{"type": "sine", "component_id": "clip-tone-z", "amplitude_v": 0.2, "frequency_hz": 1000.0, "phase_rad": 0.0}]},
+    {"channel_id": "charge-signal", "raw_unit": "V", "bias_v": 0.0, "components": [{"type": "sine", "component_id": "clip-tone-charge", "amplitude_v": 0.2, "frequency_hz": 1000.0, "phase_rad": 0.0}]}
+  ],
+  "fault_schedule": [
+    {"type": "clipping", "fault_id": "input-limits", "channel_ids": ["accel-x", "accel-y", "accel-z"], "minimum_v": 1.6, "maximum_v": 1.7, "start_sample": 0},
+    {"type": "clipping", "fault_id": "charge-limits", "channel_ids": ["charge-signal"], "minimum_v": -0.05, "maximum_v": 0.05, "start_sample": 0}
+  ]
+}
